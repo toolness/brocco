@@ -43,8 +43,8 @@
 //   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
 //   [CodeMirror]: http://codemirror.net/demo/runmode.html
-//   [with]: index.html
-//   [without]: syntax-highlighting.html
+//   [with]: syntax-highlighting.html
+//   [without]: index.html
 //   [syntax-highlighting.html]: https://github.com/toolness/brocco/blob/gh-pages/syntax-highlighting.html
 
 var Brocco = (function() {
