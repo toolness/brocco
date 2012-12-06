@@ -123,13 +123,17 @@ var Brocco = (function() {
     ]).innerHTML;
   }
   
+  // Retrieve the given file over XHR.
   function getFile(path, cb) {
     var req = new XMLHttpRequest();
     req.open("GET", path);
     req.onload = function() { cb(req.responseText); };
     req.send(null);
   }
-  
+
+  // Generate the documentation for a source file by (optionally) reading it
+  // in, splitting it up into comment/code sections, highlighting them for
+  // the appropriate language, and merging them into an HTML template.
   function generateDocumentation(source, config, callback) {
     var code;
 
@@ -158,6 +162,16 @@ var Brocco = (function() {
       parseAndHighlight();
   }
 
+  // Given a string of source code, parse out each comment and the code that
+  // follows it, and create an individual **section** for it.
+  // Sections take the form:
+  //
+  //     {
+  //       docsText: ...
+  //       docsHtml: ...
+  //       codeText: ...
+  //       codeHtml: ...
+  //     }
   function parse(source, code) {
     var codeText, docsText, hasCode, language, line, lines, save, 
         sections, _i, _len;
@@ -189,6 +203,16 @@ var Brocco = (function() {
     return sections;
   };
   
+  // Highlights parsed sections of code. Runs the text of
+  // their corresponding comments through **Markdown**, using
+  // [Showdown.js][]. If no syntax highlighter is present, output the
+  // code in plain text.
+  //
+  // We process all sections with a single call to the syntax highlighter,
+  // by inserting marker comments between them, and then splitting the
+  // result string wherever the marker occurs.
+  //
+  //   [Showdown.js]: http://attacklab.net/showdown/
   function highlight(source, sections, config, callback) {
     var section;
     var language = getLanguage(source);
@@ -225,15 +249,25 @@ var Brocco = (function() {
     });
   };
 
+  // Get the current language we're documenting, based on the extension.
   function getLanguage(source) {
     return languages[path.extname(source)];
   };
   
+  // Build out the appropriate matchers and delimiters for each language.
   function processLanguages(languages) {
     for (var ext in languages) {
       var l = languages[ext];
+      // Does the line begin with a comment?
       l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
+      
+      // Ignore [hashbangs][] and interpolations...
+      //
+      //   [hashbangs]: http://en.wikipedia.org/wiki/Shebang_(Unix\)
       l.commentFilter = /(^#![/]|^\s*#\{)/;
+        
+      // The dividing token we feed into the syntax highlighter, to delimit
+      // the boundaries between sections.
       l.dividerText = "\n" + l.symbol + "DIVIDER\n";
     }
   }
