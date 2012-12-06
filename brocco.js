@@ -1,8 +1,51 @@
 "use strict";
 
-// This is a simple port of [docco][] to the browser.
+// This is a simple port of [docco][] to the browser, useful for
+// projects or developers who are too lazy to deal with a build/deploy step
+// for their documentation. This makes it a bit like docco combined
+// with [Code Illuminated][].
 //
+// Syntax highlighting is optional; as an example, you can see this
+// documentation [with][] or [without][] it.
+//
+// The [source for Brocco][source] is available on GitHub, and released under
+// the MIT license.
+//
+// ## Dependencies
+//
+// The only required dependencies are `brocco.js`, `docco.css`, and
+// `showdown.js`.
+//
+// ## Usage
+//
+// After including the requisite scripts and CSS file in a webpage,
+// you can render basic documentation like this:
+//
+//     Brocco.document("myfile.js", function(html) {
+//       document.getElementById("mydocs").innerHTML = html;
+//     });
+//
+// By default, brocco will try to fetch the source file over XHR. If
+// you have it on hand, though, you can do this:
+//
+//     Brocco.document("myfile.js", {
+//       code: "console.log('hello world.');"
+//     }, function(html) {
+//       document.getElementById("docs").innerHTML = html;
+//     });
+// 
+// Syntax highlighting requires a separate third-party library, as well
+// as some code to glue things together. See the source code of 
+// <code>[syntax-highlighting.html][]</code> for an example of integration
+// with [CodeMirror][].
+//
+//   [source]: https://github.com/toolness/brocco
 //   [docco]: http://jashkenas.github.com/docco/
+//   [Code Illuminated]: http://www.toolness.com/wp/?p=441
+//   [CodeMirror]: http://codemirror.net/demo/runmode.html
+//   [with]: index.html
+//   [without]: syntax-highlighting.html
+//   [syntax-highlighting.html]: https://github.com/toolness/brocco/blob/gh-pages/syntax-highlighting.html
 
 var Brocco = (function() {
   var version = "0.1.0";
