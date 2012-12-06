@@ -67,14 +67,7 @@ var Brocco = (function() {
     var result = '<div class="highlight"><pre>' +
                  div.innerHTML +
                  '</pre></div>\n';
-    // We need to make sure that the dividers that docco munges
-    // into the code are properly formatted to *look* like
-    // syntax highlighting, so that docco is able to process
-    // our output properly.
-    var parts = result.split(language.dividerText);
-    var html = parts.join('\n<span class="c">' + language.symbol + 
-                          'DIVIDER</span>\n');
-    cb(html);
+    cb(result, language.dividerText);
   }
   
   // This default template produces an identical DOM to the 
@@ -211,10 +204,10 @@ var Brocco = (function() {
     var mungedSource = text.join(language.dividerText);
     var highlight = config.highlightSyntax || defaultHighlightSyntax;
     var showdown = config.showdown || new Showdown.converter();
-    highlight(language, mungedSource, function(output) {
+    highlight(language, mungedSource, function(output, dividerHtml) {
       var fragments, i, section, _i, _len;
       output = output.replace(highlightStart, '').replace(highlightEnd, '');
-      fragments = output.split(language.dividerHtml);
+      fragments = output.split(dividerHtml);
       for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
         section = sections[i];
         section.codeHtml = highlightStart + fragments[i] + highlightEnd;
@@ -242,8 +235,6 @@ var Brocco = (function() {
       l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
       l.commentFilter = /(^#![/]|^\s*#\{)/;
       l.dividerText = "\n" + l.symbol + "DIVIDER\n";
-      l.dividerHtml = RegExp("\\n*<span\\sclass=\"c1?\">" + l.symbol +
-                             "DIVIDER<\\/span>\\n*");
     }
   }
   
