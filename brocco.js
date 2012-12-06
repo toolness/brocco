@@ -85,7 +85,8 @@ var Brocco = (function() {
   }
 
   function parse(source, code) {
-    var codeText, docsText, hasCode, language, line, lines, save, sections, _i, _len;
+    var codeText, docsText, hasCode, language, line, lines, save, 
+        sections, _i, _len;
     lines = code.split('\n');
     sections = [];
     language = getLanguage(source);
@@ -98,7 +99,8 @@ var Brocco = (function() {
     };
     for (_i = 0, _len = lines.length; _i < _len; _i++) {
       line = lines[_i];
-      if (line.match(language.commentMatcher) && !line.match(language.commentFilter)) {
+      if (line.match(language.commentMatcher) &&
+          !line.match(language.commentFilter)) {
         if (hasCode) {
           save(docsText, codeText);
           hasCode = docsText = codeText = '';
@@ -153,7 +155,13 @@ var Brocco = (function() {
   };
 
   function template(str) {
-    return new Function('obj', 'var p=[],print=function(){p.push.apply(p,arguments);};' + 'with(obj){p.push(\'' + str.replace(/[\r\t\n]/g, " ").replace(/'(?=[^<]*%>)/g, "\t").split("'").join("\\'").split("\t").join("'").replace(/<%=(.+?)%>/g, "',$1,'").split('<%').join("');").split('%>').join("p.push('") + "');}return p.join('');");
+    return new Function('obj',
+      'var p=[],print=function(){p.push.apply(p,arguments);};' +
+      'with(obj){p.push(\'' + 
+      str.replace(/[\r\t\n]/g, " ").replace(/'(?=[^<]*%>)/g, "\t")
+         .split("'").join("\\'").split("\t").join("'")
+         .replace(/<%=(.+?)%>/g, "',$1,'").split('<%').join("');")
+         .split('%>').join("p.push('") + "');}return p.join('');");
   };
   
   function processLanguages(languages) {
@@ -162,7 +170,8 @@ var Brocco = (function() {
       l.commentMatcher = RegExp("^\\s*" + l.symbol + "\\s?");
       l.commentFilter = /(^#![/]|^\s*#\{)/;
       l.dividerText = "\n" + l.symbol + "DIVIDER\n";
-      l.dividerHtml = RegExp("\\n*<span\\sclass=\"c1?\">" + l.symbol + "DIVIDER<\\/span>\\n*");
+      l.dividerHtml = RegExp("\\n*<span\\sclass=\"c1?\">" + l.symbol +
+                             "DIVIDER<\\/span>\\n*");
     }
   }
   
