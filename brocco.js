@@ -2,7 +2,7 @@
 
 // This is a simple port of [Docco][] to the browser, useful for
 // projects or developers who are too lazy to deal with a build/deploy step
-// for their documentation. This makes it a bit like docco combined
+// for their documentation. This makes it a bit like Docco combined
 // with [Code Illuminated][].
 //
 // Syntax highlighting is optional; as an example, you can see this
