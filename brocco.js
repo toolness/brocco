@@ -274,6 +274,9 @@ var Brocco = (function() {
   
   processLanguages(languages);
   
+  // ## Exports
+  //
+  // Information about brocco, and functions for programmatic usage.
   return {
     version: version,
     document: generateDocumentation,
