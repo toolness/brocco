@@ -84,7 +84,9 @@ var Brocco = (function() {
     req.send(null);
   }
   
-  function generateDocumentation(source, code, config, callback) {
+  function generateDocumentation(source, config, callback) {
+    var code;
+
     var parseAndHighlight = function() {
       var sections = parse(source, code);
       return highlight(source, sections, config, function() {
@@ -102,17 +104,12 @@ var Brocco = (function() {
         parseAndHighlight();
     };
     
-    if (typeof(code) != "string") {
-      callback = config;
-      config = code;
-      code = undefined;
-    }
-    
     if (typeof(config) != "object") {
       callback = config;
       config = {};
     }
-    
+
+    code = config.code;
     if (!config.template)
       config.template = "brocco.jst";
     
