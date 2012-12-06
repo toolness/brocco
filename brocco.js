@@ -102,9 +102,21 @@ var Brocco = (function() {
         parseAndHighlight();
     };
     
-    if (typeof(code) == "object") {
+    if (typeof(code) != "string") {
       callback = config;
       config = code;
+      code = undefined;
+    }
+    
+    if (typeof(config) != "object") {
+      callback = config;
+      config = {};
+    }
+    
+    if (!config.template)
+      config.template = "brocco.jst";
+    
+    if (typeof(code) == "undefined") {
       getFile(source, function(contents) {
         code = contents;
         processConfig();
