@@ -126,14 +126,14 @@ var Brocco = (function() {
   
   // Highlights parsed sections of code. Runs the text of
   // their corresponding comments through **Markdown**, using
-  // [Showdown.js][]. If no syntax highlighter is present, output the
+  // [Showdown][]. If no syntax highlighter is present, output the
   // code in plain text.
   //
   // We process all sections with a single call to the syntax highlighter,
   // by inserting marker comments between them, and then splitting the
   // result string wherever the marker occurs.
   //
-  //   [Showdown.js]: http://attacklab.net/showdown/
+  //   [Showdown]: http://attacklab.net/showdown/
   function highlight(source, sections, config, callback) {
     var section;
     var language = getLanguage(source);
@@ -209,7 +209,9 @@ var Brocco = (function() {
   var highlightStart = '<div class="highlight"><pre>';
   var highlightEnd = '</pre></div>';
   
-  // This is a stand-in for node's `path` module.
+  // This is a stand-in for node's <code>[path][]</code> module.
+  //
+  //   [path]: http://nodejs.org/api/path.html
   var path = {
     basename: function(p, ext) {
       var lastPart = p.split('/').slice(-1)[0];
@@ -236,9 +238,9 @@ var Brocco = (function() {
   }
   
   // This default template produces an identical DOM to the 
-  // [docco.jst][] template used by Docco for single-source files. It's just
-  // easier to inline it than grab it via XHR because it complicates
-  // the use and deployment of this browser-side script.
+  // <code>[docco.jst][]</code> template used by Docco for single-source
+  // files. It's just easier to inline it than grab it via XHR because it
+  // complicates the use and deployment of this browser-side script.
   //
   //   [docco.jst]: https://github.com/jashkenas/docco/blob/master/resources/docco.jst
   function defaultTemplate(context) {
