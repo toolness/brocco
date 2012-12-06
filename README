@@ -1,0 +1,5 @@
+Brocco is a simple port of Docco to the browser, useful for projects
+or developers who are too lazy to deal with a build/deploy step for
+their documentation. For more information, see:
+
+http://toolness.github.com/brocco/
