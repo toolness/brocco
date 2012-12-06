@@ -1,6 +1,6 @@
 "use strict";
 
-// This is a simple port of [docco][] to the browser, useful for
+// This is a simple port of [Docco][] to the browser, useful for
 // projects or developers who are too lazy to deal with a build/deploy step
 // for their documentation. This makes it a bit like docco combined
 // with [Code Illuminated][].
@@ -25,7 +25,7 @@
 //       document.getElementById("mydocs").innerHTML = html;
 //     });
 //
-// By default, brocco will try to fetch the source file over XHR. If
+// By default, Brocco will try to fetch the source file over XHR. If
 // you have it on hand, though, you can do this:
 //
 //     Brocco.document("myfile.js", {
@@ -40,7 +40,7 @@
 // with [CodeMirror][].
 //
 //   [source]: https://github.com/toolness/brocco
-//   [docco]: http://jashkenas.github.com/docco/
+//   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
 //   [CodeMirror]: http://codemirror.net/demo/runmode.html
 //   [with]: index.html
@@ -319,7 +319,7 @@ var Brocco = (function() {
   
   // ## Exports
   //
-  // Information about brocco, and functions for programmatic usage.
+  // Information about Brocco, and functions for programmatic usage.
   return {
     version: version,
     document: generateDocumentation,
