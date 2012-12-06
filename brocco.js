@@ -60,7 +60,7 @@ var Brocco = (function() {
   // This default syntax highlighter really doesn't do any
   // syntax highlighting at all; it just plops the plain-text
   // source code in a `<pre>` element.
-  function defaultHighlightSyntax(language, code, cb) {
+  function defaultHighlighter(language, code, cb) {
     // We'll leverage the DOM to do HTML escaping for us.
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(code));
@@ -202,9 +202,9 @@ var Brocco = (function() {
       return _results;
     })();
     var mungedSource = text.join(language.dividerText);
-    var highlight = config.highlightSyntax || defaultHighlightSyntax;
+    var highlighter = config.highlighter || defaultHighlighter;
     var showdown = config.showdown || new Showdown.converter();
-    highlight(language, mungedSource, function(output, dividerHtml) {
+    highlighter(language, mungedSource, function(output, dividerHtml) {
       var fragments, i, section, _i, _len;
       output = output.replace(highlightStart, '').replace(highlightEnd, '');
       fragments = output.split(dividerHtml);
@@ -243,6 +243,7 @@ var Brocco = (function() {
   return {
     version: version,
     document: generateDocumentation,
+    defaultHighlighter: defaultHighlighter,
     languages: languages
   };
 })();
