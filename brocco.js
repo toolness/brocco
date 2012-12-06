@@ -77,6 +77,59 @@ var Brocco = (function() {
     cb(html);
   }
   
+  // This default template produces an identical DOM to the 
+  // [docco.jst][] template used by Docco for single-source files. It's just
+  // easier to inline it than grab it via XHR because it complicates
+  // the use and deployment of this browser-side script.
+  //
+  //   [docco.jst]: https://github.com/jashkenas/docco/blob/master/resources/docco.jst
+  function defaultTemplate(context) {
+    function el(name, attrs, children) {
+      var element = document.createElement(name);
+      Object.keys(attrs).forEach(function(attr) {
+        element.setAttribute(attr, attrs[attr]);
+      });
+      (children || []).forEach(function(child) {
+        if (typeof(child) == "string") {
+          var temp = document.createElement("div");
+          temp.innerHTML = child;
+          for (var i = 0; i < temp.childNodes.length; i++)
+            element.appendChild(temp.childNodes[i]);
+        } else
+          element.appendChild(child);
+      });
+      return element;
+    }
+
+    return el("div", {}, [
+      el("div", {id: "container"}, [
+        el("div", {id: "background"}),
+        el("table", {cellpadding: 0, cellspacing: 0}, [
+          el("thead", {}, [
+            el("tr", {}, [
+              el("th", {"class": "docs"}, [el("h1", {}, [context.title])]),
+              el("th", {"class": "code"})
+            ])
+          ]),
+          el("tbody", {}, context.sections.map(function(section, i) {
+            return el("tr", {id: "section-" + (i+1)}, [
+              el("td", {"class": "docs"}, [
+                el("div", {"class": "pilwrap"}, [
+                  el("a", {
+                    "class": "pilcrow",
+                    "href": "#section-" + (i+1)
+                  }, ["&#182;"])
+                ]),
+                section.docsHtml
+              ]),
+              el("td", {"class": "code"}, [section.codeHtml])
+            ]);
+          }))
+        ])
+      ])
+    ]).innerHTML;
+  }
+  
   function getFile(path, cb) {
     var req = new XMLHttpRequest();
     req.open("GET", path);
@@ -94,16 +147,6 @@ var Brocco = (function() {
       });
     };
 
-    var processConfig = function() {
-      if (typeof(config.template) == "string") {
-        getFile(config.template, function(contents) {
-          config.template = template(contents);
-          parseAndHighlight();
-        });
-      } else
-        parseAndHighlight();
-    };
-    
     if (typeof(config) != "object") {
       callback = config;
       config = {};
@@ -111,15 +154,15 @@ var Brocco = (function() {
 
     code = config.code;
     if (!config.template)
-      config.template = "brocco.jst";
+      config.template = defaultTemplate;
     
     if (typeof(code) == "undefined") {
       getFile(source, function(contents) {
         code = contents;
-        processConfig();
+        parseAndHighlight();
       });
     } else
-      processConfig();
+      parseAndHighlight();
   }
 
   function parse(source, code) {
@@ -192,16 +235,6 @@ var Brocco = (function() {
   function getLanguage(source) {
     return languages[path.extname(source)];
   };
-
-  function template(str) {
-    return new Function('obj',
-      'var p=[],print=function(){p.push.apply(p,arguments);};' +
-      'with(obj){p.push(\'' + 
-      str.replace(/[\r\t\n]/g, " ").replace(/'(?=[^<]*%>)/g, "\t")
-         .split("'").join("\\'").split("\t").join("'")
-         .replace(/<%=(.+?)%>/g, "',$1,'").split('<%').join("');")
-         .split('%>').join("p.push('") + "');}return p.join('');");
-  };
   
   function processLanguages(languages) {
     for (var ext in languages) {
@@ -219,7 +252,6 @@ var Brocco = (function() {
   return {
     version: version,
     document: generateDocumentation,
-    template: template,
     languages: languages
   };
 })();
