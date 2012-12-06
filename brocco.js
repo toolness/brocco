@@ -57,6 +57,26 @@ var Brocco = (function() {
     }
   };
 
+  // This default syntax highlighter really doesn't do any
+  // syntax highlighting at all; it just plops the plain-text
+  // source code in a `<pre>` element.
+  function defaultHighlightSyntax(language, code, cb) {
+    // We'll leverage the DOM to do HTML escaping for us.
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(code));
+    var result = '<div class="highlight"><pre>' +
+                 div.innerHTML +
+                 '</pre></div>\n';
+    // We need to make sure that the dividers that docco munges
+    // into the code are properly formatted to *look* like
+    // syntax highlighting, so that docco is able to process
+    // our output properly.
+    var parts = result.split(language.dividerText);
+    var html = parts.join('\n<span class="c">' + language.symbol + 
+                          'DIVIDER</span>\n');
+    cb(html);
+  }
+  
   function generateDocumentation(source, code, config, callback) {
     var sections = parse(source, code);
     return highlight(source, sections, config, function() {
@@ -106,7 +126,8 @@ var Brocco = (function() {
       return _results;
     })();
     var mungedSource = text.join(language.dividerText);
-    config.highlightSyntax(language, mungedSource, function(output) {
+    var highlight = config.highlightSyntax || defaultHighlightSyntax;
+    highlight(language, mungedSource, function(output) {
       var fragments, i, section, _i, _len;
       output = output.replace(highlightStart, '').replace(highlightEnd, '');
       fragments = output.split(language.dividerHtml);
