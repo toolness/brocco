@@ -77,11 +77,40 @@ var Brocco = (function() {
     cb(html);
   }
   
+  function getFile(path, cb) {
+    var req = new XMLHttpRequest();
+    req.open("GET", path);
+    req.onload = function() { cb(req.responseText); };
+    req.send(null);
+  }
+  
   function generateDocumentation(source, code, config, callback) {
-    var sections = parse(source, code);
-    return highlight(source, sections, config, function() {
-      callback(generateHtml(source, sections, config));
-    });
+    var parseAndHighlight = function() {
+      var sections = parse(source, code);
+      return highlight(source, sections, config, function() {
+        callback(generateHtml(source, sections, config));
+      });
+    };
+
+    var processConfig = function() {
+      if (typeof(config.template) == "string") {
+        getFile(config.template, function(contents) {
+          config.template = template(contents);
+          parseAndHighlight();
+        });
+      } else
+        parseAndHighlight();
+    };
+    
+    if (typeof(code) == "object") {
+      callback = config;
+      config = code;
+      getFile(source, function(contents) {
+        code = contents;
+        processConfig();
+      });
+    } else
+      processConfig();
   }
 
   function parse(source, code) {

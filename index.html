@@ -6,25 +6,7 @@
 <script src="showdown.js"></script>
 <script src="brocco.js"></script>
 <script>
-function getFiles(files, cb) {
-  var contents = {};
-  files.forEach(function(filename) {
-    var req = new XMLHttpRequest();
-    req.open("GET", filename);
-    req.onload = function() {
-      contents[filename] = req.responseText;
-      if (Object.keys(contents).length == files.length)
-        cb(contents);
-    };
-    req.send(null);
-  });
-}
-
-getFiles(["brocco.jst", "brocco.js"], function(contents) {
-  Brocco.document("brocco.js", contents["brocco.js"], {
-    template: Brocco.template(contents["brocco.jst"])
-  }, function(html) {
-    document.getElementById("docs").innerHTML = html;
-  });
+Brocco.document("brocco.js", {template: "brocco.jst"}, function(html) {
+  document.getElementById("docs").innerHTML = html;
 });
 </script>
