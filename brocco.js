@@ -129,6 +129,7 @@ var Brocco = (function() {
     })();
     var mungedSource = text.join(language.dividerText);
     var highlight = config.highlightSyntax || defaultHighlightSyntax;
+    var showdown = config.showdown || new Showdown.converter();
     highlight(language, mungedSource, function(output) {
       var fragments, i, section, _i, _len;
       output = output.replace(highlightStart, '').replace(highlightEnd, '');
@@ -136,7 +137,7 @@ var Brocco = (function() {
       for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
         section = sections[i];
         section.codeHtml = highlightStart + fragments[i] + highlightEnd;
-        section.docsHtml = config.showdown.makeHtml(section.docsText);
+        section.docsHtml = showdown.makeHtml(section.docsText);
       }
       return callback();
     });

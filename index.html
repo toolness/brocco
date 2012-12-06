@@ -22,7 +22,6 @@ function getFiles(files, cb) {
 
 getFiles(["brocco.jst", "brocco.js"], function(contents) {
   Brocco.document("brocco.js", contents["brocco.js"], {
-    showdown: new Showdown.converter(),
     template: Brocco.template(contents["brocco.jst"])
   }, function(html) {
     document.getElementById("docs").innerHTML = html;
