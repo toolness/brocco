@@ -16,6 +16,12 @@
 // The only required dependencies are `brocco.js`, `docco.css`, and
 // `showdown.js`.
 //
+// Optional syntax highlighting requires [CodeMirror][]. Simply
+// include `codemirror.js` and the modes for any
+// languages you're documenting, and Brocco will take care of
+// the rest. See <code>[syntax-highlighting.html][]</code> for
+// an example.
+//
 // ## Usage
 //
 // After including the requisite scripts and CSS file in a webpage,
@@ -34,15 +40,10 @@
 //       document.getElementById("docs").innerHTML = html;
 //     });
 // 
-// Syntax highlighting requires a separate third-party library, as well
-// as some code to glue things together. See the source code of 
-// <code>[syntax-highlighting.html][]</code> for an example of integration
-// with [CodeMirror][].
-//
 //   [source]: https://github.com/toolness/brocco
 //   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
-//   [CodeMirror]: http://codemirror.net/demo/runmode.html
+//   [CodeMirror]: http://codemirror.net/
 //   [with]: syntax-highlighting.html
 //   [without]: index.html
 //   [syntax-highlighting.html]: https://github.com/toolness/brocco/blob/gh-pages/syntax-highlighting.html
@@ -142,7 +143,7 @@ var Brocco = (function() {
       }
       return _results;
     })();
-    var highlighter = config.highlighter || defaultHighlighter;
+    var highlighter = config.highlighter || codeMirrorHighlighter;
     var showdown = config.showdown || new Showdown.converter();
     highlighter(language, text, function(fragments) {
       var fragments, i, section, _i, _len;
@@ -165,31 +166,39 @@ var Brocco = (function() {
 
   // ## Helpers & Setup
   
-  // Originally, this was in a separate JSON file, but we're including
+  // Mappings between CodeMirror styles and the Pygments styles
+  // defined in `docco.css`.
+  var codeMirrorStyleMap = {
+    "keyword": "k",
+    "atom": "kc",
+    "number": "m",
+    "comment": "c",
+    "string": "s2",
+    "string-2": "s2",
+  };
+  
+  // Each item maps the file extension to the name of the CodeMirror mode
+  // and the symbol that indicates a comment.
+  //
+  // In Docco, this was in a separate JSON file, but we're including
   // it inline for simplicity.
   var languages = {
     ".coffee" :
-      {"name" : "coffee-script", "symbol" : "#"},
+      {"name" : "coffeescript", "symbol" : "#"},
     ".rb":
       {"name" : "ruby", "symbol" : "#"},
     ".py":
       {"name": "python", "symbol" : "#"},
-    ".feature":
-      {"name" : "gherkin", "symbol" : "#"},
     ".yaml":
       {"name" : "yaml", "symbol" : "#"},
-    ".tex":
-      {"name" : "tex", "symbol" : "%"},
-    ".latex":
-      {"name" : "tex", "symbol" : "%"},
     ".js":
       {"name" : "javascript", "symbol" : "//"},
     ".c":
-      {"name" : "c", "symbol" : "//"},
+      {"name" : "clike", "symbol" : "//"},
     ".h":
-      {"name" : "c", "symbol" : "//"},
+      {"name" : "clike", "symbol" : "//"},
     ".cpp":
-      {"name" : "cpp", "symbol" : "//"},
+      {"name" : "clike", "symbol" : "//"},
     ".php":
       {"name" : "php", "symbol" : "//"},
     ".hs":
@@ -215,10 +224,85 @@ var Brocco = (function() {
     }
   };
   
-  // This default syntax highlighter really doesn't do any
-  // syntax highlighting at all; it just plops the plain-text
-  // source code in a `<pre>` element.
-  function defaultHighlighter(language, fragments, cb) {
+  // This is a modified version of CodeMirror's [runmode][],
+  // used to leverage CodeMirror's code editing modes for
+  // syntax highlighting.
+  //
+  // If CodeMirror isn't detected or support for the current
+  // language isn't available, this function falls back to
+  // no highlighting.
+  //
+  //   [runmode]: http://codemirror.net/demo/runmode.html
+  function codeMirrorHighlighter(language, fragments, cb) {
+    if (typeof(CodeMirror) == "undefined")
+      return nullHighlighter(language, fragments, cb);
+
+    var mode = CodeMirror.getMode(CodeMirror.defaults, {
+      name: language.name
+    });
+    if (mode.name == "null")
+      return nullHighlighter(language, fragments, cb);
+      
+    var esc = htmlEscape;
+    var string = fragments.join("\n" + language.symbol + "DIVIDER\n");
+    var tabSize = CodeMirror.defaults.tabSize;
+    var accum = [], col = 0;
+    var onText = function(text, style) {
+      if (text == "\n") {
+        accum.push("\n");
+        col = 0;
+        return;
+      }
+      var escaped = "";
+      // HTML-escape and replace tabs.
+      for (var pos = 0;;) {
+        var idx = text.indexOf("\t", pos);
+        if (idx == -1) {
+          escaped += esc(text.slice(pos));
+          col += text.length - pos;
+          break;
+        } else {
+          col += idx - pos;
+          escaped += esc(text.slice(pos, idx));
+          var size = tabSize - col % tabSize;
+          col += size;
+          for (var i = 0; i < size; ++i) escaped += " ";
+          pos = idx + 1;
+        }
+      }
+
+      if (style) {
+        if (codeMirrorStyleMap[style])
+          style = codeMirrorStyleMap[style] + " cm-" + style;
+        else
+          style = "cm-" + style;
+        accum.push("<span class=\"" + esc(style) +
+                   "\">" + escaped + "</span>");
+      } else
+        accum.push(escaped);
+    };
+    
+    var lines = CodeMirror.splitLines(string),
+        state = CodeMirror.startState(mode);
+    for (var i = 0, e = lines.length; i < e; ++i) {
+      if (i) onText("\n");
+      var stream = new CodeMirror.StringStream(lines[i]);
+      while (!stream.eol()) {
+        var style = mode.token(stream, state);
+        onText(stream.current(), style, i, stream.start);
+        stream.start = stream.pos;
+      }
+    }
+    
+    fragments = accum.join("")
+      .split('\n<span class="c cm-comment">' +
+             language.symbol + 'DIVIDER</span>\n');
+    cb(fragments.map(function(code) { return '<pre>' + code + '</pre>'; }));
+  }
+  
+  // This null syntax highlighter doesn't do any syntax highlighting at
+  // all; it just plops the plain-text source code in a `<pre>` element.
+  function nullHighlighter(language, fragments, cb) {
     cb(fragments.map(function(code) {
       return '<pre>' + htmlEscape(code) + '</pre>';
     }));
@@ -319,7 +403,8 @@ var Brocco = (function() {
   return {
     version: version,
     document: generateDocumentation,
-    defaultHighlighter: defaultHighlighter,
+    nullHighlighter: nullHighlighter,
+    codeMirrorHighlighter: codeMirrorHighlighter,
     languages: languages
   };
 })();

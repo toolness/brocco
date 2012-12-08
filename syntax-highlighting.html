@@ -1,31 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" href="docco.css">
-<link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
 <title>brocco.js</title>
-<div id="docs" class="cm-s-default"></div>
+<div id="docs"></div>
 <script src="showdown.js"></script>
 <script src="brocco.js"></script>
 <script src="http://codemirror.net/lib/codemirror.js"></script>
-<script src="http://codemirror.net/lib/util/runmode.js"></script>
 <script src="http://codemirror.net/mode/javascript/javascript.js"></script>
 <script>
-// Simple Brocco highlighter function that uses CodeMirror to highlight
-// JS source code.
-function cmHighlighter(language, code, cb) {
-  if (language.name == "javascript") {
-    // We need to let Brocco know how to split out all the sections of
-    // source code so it can insert documentation alongside them.
-    var dividerHtml = RegExp("\\n*<span\\sclass=\"cm-comment\">" + 
-                             language.symbol + "DIVIDER<\\/span>\\n*");
-    var output = document.createElement("div");
-    CodeMirror.runMode(code, "text/javascript", output);
-    return cb(output.innerHTML, dividerHtml);
-  }
-  return Brocco.defaultHighlighter(language, code, cb);
-}
-
-Brocco.document("brocco.js", {highlighter: cmHighlighter}, function(html) {
+Brocco.document("brocco.js", function(html) {
   document.getElementById("docs").innerHTML = html;
 });
 </script>
