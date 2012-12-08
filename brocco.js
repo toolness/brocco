@@ -129,10 +129,6 @@ var Brocco = (function() {
   // [Showdown][]. If no syntax highlighter is present, output the
   // code in plain text.
   //
-  // We process all sections with a single call to the syntax highlighter,
-  // by inserting marker comments between them, and then splitting the
-  // result string wherever the marker occurs.
-  //
   //   [Showdown]: http://attacklab.net/showdown/
   function highlight(source, sections, config, callback) {
     var section;
@@ -146,16 +142,13 @@ var Brocco = (function() {
       }
       return _results;
     })();
-    var mungedSource = text.join(language.dividerText);
     var highlighter = config.highlighter || defaultHighlighter;
     var showdown = config.showdown || new Showdown.converter();
-    highlighter(language, mungedSource, function(output, dividerHtml) {
+    highlighter(language, text, function(fragments) {
       var fragments, i, section, _i, _len;
-      output = output.replace(highlightStart, '').replace(highlightEnd, '');
-      fragments = output.split(dividerHtml);
       for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
         section = sections[i];
-        section.codeHtml = highlightStart + fragments[i] + highlightEnd;
+        section.codeHtml = fragments[i];
         section.docsHtml = showdown.makeHtml(section.docsText);
       }
       return callback();
@@ -206,8 +199,6 @@ var Brocco = (function() {
     ".hrl":
       {"name" : "erlang", "symbol" : "%"}
   };
-  var highlightStart = '<div class="highlight"><pre>';
-  var highlightEnd = '</pre></div>';
   
   // This is a stand-in for node's <code>[path][]</code> module.
   //
@@ -223,18 +214,14 @@ var Brocco = (function() {
       return '.' + filename.split('.').slice(-1)[0];
     }
   };
-
+  
   // This default syntax highlighter really doesn't do any
   // syntax highlighting at all; it just plops the plain-text
   // source code in a `<pre>` element.
-  function defaultHighlighter(language, code, cb) {
-    // We leverage the DOM to do HTML escaping for us.
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(code));
-    var result = '<div class="highlight"><pre>' +
-                 div.innerHTML +
-                 '</pre></div>\n';
-    cb(result, language.dividerText);
+  function defaultHighlighter(language, fragments, cb) {
+    cb(fragments.map(function(code) {
+      return '<pre>' + htmlEscape(code) + '</pre>';
+    }));
   }
   
   // This default template produces an identical DOM to the 
@@ -290,6 +277,13 @@ var Brocco = (function() {
     ]).innerHTML;
   }
   
+  // Leverage the DOM to do HTML escaping for us.
+  function htmlEscape(text) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+  }
+  
   // Retrieve the given file over XHR.
   function getFile(path, cb) {
     var req = new XMLHttpRequest();
@@ -314,10 +308,6 @@ var Brocco = (function() {
       //
       //   [hashbangs]: http://en.wikipedia.org/wiki/Shebang_(Unix\)
       l.commentFilter = /(^#![/]|^\s*#\{)/;
-        
-      // The dividing token we feed into the syntax highlighter, to delimit
-      // the boundaries between sections.
-      l.dividerText = "\n" + l.symbol + "DIVIDER\n";
     }
   }
   
