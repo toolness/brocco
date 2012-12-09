@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="vendor/docco.css">
+<title></title>
+<div id="container">
+  <div id="background"></div>
+  <div id="jump_to">
+    Jump To &hellip;
+    <div id="jump_wrapper">
+      <div id="jump_page"></div>
+  </div>
+</div>
+<script src="vendor/showdown.js"></script>
+<script src="vendor/codemirror.js"></script>
+<script src="vendor/codemirror-javascript-mode.js"></script>
+<script src="brocco.js"></script>
+<script>
+var DEFAULT_SOURCE = "brocco";
+var SOURCE_MAP = {
+  "brocco": "brocco.js",
+  "codemirror": "vendor/codemirror.js",
+  "showdown": "vendor/showdown.js"
+};
+var source = location.search.slice(1);
+
+if (!(source in SOURCE_MAP))
+  source = DEFAULT_SOURCE;
+
+Object.keys(SOURCE_MAP).forEach(function(source) {
+  var a = document.createElement("a");
+  a.setAttribute("class", "source");
+  a.setAttribute("href", "?" + source);
+  a.textContent = Brocco.path.basename(SOURCE_MAP[source]);
+  document.getElementById("jump_page").appendChild(a);
+});
+
+Brocco.document(SOURCE_MAP[source], function(html) {
+  var temp = document.createElement("div");
+  temp.innerHTML = html;
+  var table = temp.querySelector("table");
+  document.getElementById("container").appendChild(table);
+});
+</script>

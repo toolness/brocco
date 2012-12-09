@@ -423,6 +423,7 @@ var Brocco = (function() {
     document: generateDocumentation,
     nullHighlighter: nullHighlighter,
     codeMirrorHighlighter: codeMirrorHighlighter,
+    path: path,
     languages: languages
   };
 })();
