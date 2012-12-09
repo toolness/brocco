@@ -18,6 +18,15 @@
 // languages you're documenting, and Brocco will take care of
 // the rest.
 //
+// ## Add-ons
+//
+// <code>[jump-to.js](?jump-to.js)</code> can be used to provide
+// a Docco-style *Jump To&hellip;* menu at the top of a page,
+// making it easy to navigate between multiple source files.
+//
+// <code>[html-and-css.js](?html-and-css.js)</code> add support for
+// documenting HTML and CSS files.
+//
 // ## Usage
 //
 // After including the requisite scripts and CSS file in a webpage,
