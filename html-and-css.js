@@ -130,7 +130,7 @@
               accum.length && text.trim() != '*/' &&
               text.slice(0, commentIndent).match(/^[\s*]+$/))
             // We want to strip out leading whitespace in multi-line
-            // CSS/JS comments. We'll also treat asterists as white-space
+            // CSS/JS comments. We'll also treat asterisks as white-space
             // here, since we want to get rid of them when converting
             // comments like this into documentation:
             //
