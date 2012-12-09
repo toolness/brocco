@@ -13,8 +13,8 @@
 //         Jump To &hellip;
 //         <div id="jump_wrapper">
 //         <div id="jump_page">
-//           <a class="source">path/to/source/foo.js</a>
-//           <a class="source">path/to/source/bar.cpp</a>
+//           <a class="source">path/to/foo.js</a>
+//           <a class="source">path/to/bar.cpp</a>
 //           <!-- ... And so on ... -->
 //         </div>
 //       </div>
