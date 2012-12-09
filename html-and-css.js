@@ -1,5 +1,5 @@
 (function() {
-  var START_COMMENT_REGEXP = /^(\<\!--|\/\*|\/\/)(\s*)(.*)/;
+  var START_COMMENT_REGEXP = /^(\<\!--|\/\*|\/\/)(\s?)(.*)/;
   var START_COMMENT_MODES = {
     '<!--': 'html',
     '/*': 'cmultiline',
@@ -47,6 +47,17 @@
         col = 0;
         return;
       }
+      if (commentMode == 'csingleline' && accum.length &&
+          style == "comment") {
+        match = text.match(START_COMMENT_REGEXP);
+        if (match[1] == '//')
+          text = match[3];
+        else {
+          commentMode = null;
+          section.docsText = accum.join("");
+          accum = [];
+        }
+      }
       if (!commentMode && style == "comment") {
         match = text.match(START_COMMENT_REGEXP);
         if (match) {
@@ -56,6 +67,11 @@
           finishSection();
           text = match[3];
         }
+      }
+      if (commentMode == 'csingleline' && style != 'comment') {
+        commentMode = null;
+        section.docsText = accum.join("");
+        accum = [];
       }
       if (commentMode) {
         if (commentMode == "html" && style === null && col == 0)
