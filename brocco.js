@@ -52,14 +52,27 @@ var Brocco = (function() {
   
   // Generate the documentation for a source file by (optionally) reading it
   // in, splitting it up into comment/code sections, highlighting them for
-  // the appropriate language, and merging them into an HTML template.
+  // the appropriate language, running the comment sections through Markdown
+  // using [Showdown][], and merging them into an HTML template.
+  //
+  //   [Showdown]: http://attacklab.net/showdown/
   function generateDocumentation(source, config, callback) {
     var code;
 
+    var language = getLanguage(source);
+    var renderSections = function(sections) {
+      var showdown = config.showdown || new Showdown.converter();
+      sections.forEach(function(section) {
+        if (section.docsText && !section.docsHtml)
+          section.docsHtml = showdown.makeHtml(section.docsText);
+        section.docsHtml = section.docsHtml || "";
+      });
+      callback(generateHtml(source, sections, config));
+    };
     var parseAndHighlight = function() {
       var sections = parse(source, code);
       return highlight(source, sections, config, function() {
-        callback(generateHtml(source, sections, config));
+        renderSections(sections);
       });
     };
 
@@ -75,6 +88,11 @@ var Brocco = (function() {
     if (!callback)
       callback = insertHtmlIntoBody;
 
+    if (language.makeSections)
+      parseAndHighlight = function() {
+        language.makeSections(source, code, config, renderSections);
+      };
+      
     if (typeof(code) == "undefined") {
       getSourceFile(source, function(contents) {
         code = contents;
@@ -125,12 +143,8 @@ var Brocco = (function() {
     return sections;
   };
   
-  // Highlights parsed sections of code. Runs the text of
-  // their corresponding comments through **Markdown**, using
-  // [Showdown][]. If no syntax highlighter is present, output the
-  // code in plain text.
-  //
-  //   [Showdown]: http://attacklab.net/showdown/
+  // Highlights parsed sections of code. If no syntax highlighter is present,
+  // output the code in plain text.
   function highlight(source, sections, config, callback) {
     var section;
     var language = getLanguage(source);
@@ -144,13 +158,11 @@ var Brocco = (function() {
       return _results;
     })();
     var highlighter = config.highlighter || codeMirrorHighlighter;
-    var showdown = config.showdown || new Showdown.converter();
     highlighter(language, text, function(fragments) {
       var fragments, i, section, _i, _len;
       for (i = _i = 0, _len = sections.length; _i < _len; i = ++_i) {
         section = sections[i];
         section.codeHtml = fragments[i];
-        section.docsHtml = showdown.makeHtml(section.docsText);
       }
       return callback();
     });
@@ -175,6 +187,8 @@ var Brocco = (function() {
     "comment": "c",
     "string": "s2",
     "string-2": "s2",
+    "tag": "nt",
+    "attribute": "na"
   };
   
   // Each item maps the file extension to the name of the CodeMirror mode
@@ -321,6 +335,8 @@ var Brocco = (function() {
         element.setAttribute(attr, attrs[attr]);
       });
       (children || []).forEach(function(child) {
+        if (typeof(child) == "undefined")
+          child = "undefined";
         if (typeof(child) == "string") {
           var temp = document.createElement("div");
           temp.innerHTML = child;
@@ -427,6 +443,13 @@ var Brocco = (function() {
     }
   }
   
+  // Helper that makes it easy to add new languages.
+  function addLanguages(l) {
+    processLanguages(l);
+    for (var ext in l)
+      languages[ext] = l[ext];
+  }
+  
   processLanguages(languages);
   
   // ## Exports
@@ -438,6 +461,9 @@ var Brocco = (function() {
     nullHighlighter: nullHighlighter,
     codeMirrorHighlighter: codeMirrorHighlighter,
     path: path,
+    addLanguages: addLanguages,
+    htmlEscape: htmlEscape,
+    codeMirrorStyleMap: codeMirrorStyleMap,
     languages: languages
   };
 })();
