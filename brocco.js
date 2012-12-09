@@ -5,9 +5,6 @@
 // documentation. This makes it a bit like Docco combined with
 // [Code Illuminated][].
 //
-// Syntax highlighting is optional; as an example, you can see this
-// documentation [with][] or [without][] it.
-//
 // The [source for Brocco][source] is available on GitHub, and released under
 // the MIT license.
 //
@@ -19,8 +16,7 @@
 // Optional syntax highlighting requires [CodeMirror][]. Simply
 // include `codemirror.js` and the modes for any
 // languages you're documenting, and Brocco will take care of
-// the rest. See <code>[syntax-highlighting.html][]</code> for
-// an example.
+// the rest.
 //
 // ## Usage
 //
@@ -44,9 +40,6 @@
 //   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
 //   [CodeMirror]: http://codemirror.net/
-//   [with]: syntax-highlighting.html
-//   [without]: index.html
-//   [syntax-highlighting.html]: https://github.com/toolness/brocco/blob/gh-pages/syntax-highlighting.html
 
 var Brocco = (function() {
   var version = "0.1.0";
