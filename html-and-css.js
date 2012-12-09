@@ -1,4 +1,4 @@
-// This is an add-on to [Brocco][] which adds support for
+// This is a zero-configuration add-on to [Brocco][] which adds support for
 // documenting HTML and CSS files.
 //
 // The process for doing this is non-trivial, since both file
