@@ -24,7 +24,7 @@
 // a Docco-style *Jump To&hellip;* menu at the top of a page,
 // making it easy to navigate between multiple source files.
 //
-// <code>[html-and-css.js](?html-and-css.js)</code> add support for
+// <code>[html-and-css.js](?html-and-css.js)</code> adds support for
 // documenting HTML and CSS files.
 //
 // ## Usage
