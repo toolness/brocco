@@ -23,6 +23,12 @@
 // After including the requisite scripts and CSS file in a webpage,
 // you can render basic documentation like this:
 //
+//     Brocco.document("myfile.js");
+//
+// This will insert the generated documentation into the page's
+// `<body>` element. Alternatively, if you want to be passed the
+// generated HTML, you can do this:
+//
 //     Brocco.document("myfile.js", function(html) {
 //       document.getElementById("mydocs").innerHTML = html;
 //     });
@@ -32,10 +38,8 @@
 //
 //     Brocco.document("myfile.js", {
 //       code: "console.log('hello world.');"
-//     }, function(html) {
-//       document.getElementById("docs").innerHTML = html;
 //     });
-// 
+//
 //   [source]: https://github.com/toolness/brocco
 //   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
@@ -68,6 +72,9 @@ var Brocco = (function() {
     if (!config.template)
       config.template = defaultTemplate;
     
+    if (!callback)
+      callback = insertHtmlIntoBody;
+
     if (typeof(code) == "undefined") {
       getFile(source, function(contents) {
         code = contents;
@@ -352,6 +359,24 @@ var Brocco = (function() {
         ])
       ])
     ]).innerHTML;
+  }
+
+  // This helper inserts the given HTML into the `<body>` element
+  // of the page. It also does a bit of hackery to ensure that
+  // named anchors are automatically navigated to.
+  function insertHtmlIntoBody(html) {
+    document.body.innerHTML = html;
+    // Some browsers, like Firefox and Opera, will automatically
+    // move the page to its old location when the user refreshes
+    // it. We'll give the browser time to do this, and only
+    // scroll the page ourselves if it doesn't.
+    setTimeout(function() {
+      if (location.hash.length > 1 && window.scrollY == 0) {
+        var el = document.getElementById(location.hash.slice(1));
+        if (el)
+          el.scrollIntoView();
+      }
+    }, 0);
   }
   
   // Leverage the DOM to do HTML escaping for us.
