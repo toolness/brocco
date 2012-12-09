@@ -76,7 +76,7 @@ var Brocco = (function() {
       callback = insertHtmlIntoBody;
 
     if (typeof(code) == "undefined") {
-      getFile(source, function(contents) {
+      getSourceFile(source, function(contents) {
         code = contents;
         parseAndHighlight();
       });
@@ -386,10 +386,24 @@ var Brocco = (function() {
     return div.innerHTML;
   }
   
-  // Retrieve the given file over XHR.
-  function getFile(path, cb) {
+  // Retrieve the given source file over XHR. If an error occurs
+  // and we're on a `file:` URL, there's a good chance it's
+  // due to browser security restrictions, so provide content
+  // that provides advice.
+  function getSourceFile(filename, cb) {
     var req = new XMLHttpRequest();
-    req.open("GET", path);
+    req.open("GET", filename);
+    req.onerror = function() {
+      var language = languages[path.extname(filename)];
+      var lines = ["Couldn't get the source file at `" + filename + "`."];
+      if (location.protocol == "file:")
+        lines = lines.concat([
+          "", "This may be due to browser security restrictions. You may ",
+          "want to consider opening this file with another browser, or " +
+          "using a simple Web server such as `python -m SimpleHTTPServer`."
+        ]);
+      cb(language.symbol + lines.join('\n' + language.symbol));
+    };
     req.onload = function() { cb(req.responseText); };
     req.send(null);
   }
