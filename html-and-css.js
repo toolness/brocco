@@ -18,12 +18,17 @@
       name : "htmlmixed",
       symbol : "",
       makeSections: makeMixedHtmlSections
+    },
+    '.css': {
+      name : "css",
+      symbol : "",
+      makeSections: makeMixedHtmlSections
     }
   });
 
   function makeMixedHtmlSections(source, code, config, cb) {
     var mode = CodeMirror.getMode(CodeMirror.defaults, {
-      name: "htmlmixed"
+      name: this.name
     });
     
     var sections = [];
