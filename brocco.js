@@ -49,6 +49,12 @@
 //       code: "console.log('hello world.');"
 //     });
 //
+// For a working example of Brocco used to document multiple
+// source files, see [index.html](?index.html).
+//
+// For more information on the use and behavior of specific API calls,
+// consult the [test suite](test/).
+//
 //   [source]: https://github.com/toolness/brocco
 //   [Docco]: http://jashkenas.github.com/docco/
 //   [Code Illuminated]: http://www.toolness.com/wp/?p=441
@@ -97,6 +103,11 @@ var Brocco = (function() {
     if (!callback)
       callback = insertHtmlIntoBody;
 
+    // Some languages actually provide their own
+    // custom parsing and highlighting functionality, due to the
+    // fact that they don't support single-line comments. See
+    // <code>[html-and-css.js](?html-and-css.js)</code> for an
+    // example.
     if (language.makeSections)
       parseAndHighlight = function() {
         language.makeSections(source, code, config, renderSections);
@@ -452,7 +463,7 @@ var Brocco = (function() {
     }
   }
   
-  // Helper that makes it easy to add new languages.
+  // This helper makes it easy to add new languages.
   function addLanguages(l) {
     processLanguages(l);
     for (var ext in l)
