@@ -63,5 +63,6 @@ Brocco.jumpTo = (function() {
     temp.innerHTML = html;
     var table = temp.querySelector("table");
     document.getElementById("container").appendChild(table);
+    Brocco.scrollLocationHashIntoView();
   });
 })();

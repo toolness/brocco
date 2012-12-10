@@ -398,10 +398,16 @@ var Brocco = (function() {
   }
 
   // This helper inserts the given HTML into the `<body>` element
-  // of the page. It also does a bit of hackery to ensure that
-  // named anchors are automatically navigated to.
+  // of the page.
   function insertHtmlIntoBody(html) {
     document.body.innerHTML = html;
+    scrollLocationHashIntoView();
+  }
+  
+  // This helper does a bit of hackery to ensure that
+  // named anchors are automatically navigated to when a
+  // page is first loaded.
+  function scrollLocationHashIntoView() {
     // Some browsers, like Firefox and Opera, will automatically
     // move the page to its old location when the user refreshes
     // it. We'll give the browser time to do this, and only
@@ -484,6 +490,7 @@ var Brocco = (function() {
     addLanguages: addLanguages,
     htmlEscape: htmlEscape,
     codeMirrorStyleMap: codeMirrorStyleMap,
+    scrollLocationHashIntoView: scrollLocationHashIntoView,
     languages: languages
   };
 })();
