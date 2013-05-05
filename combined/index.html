@@ -2,7 +2,16 @@
 <meta charset="utf-8">
 <!-- This HTML page renders the documentation for itself, serving as an
      example of how to create dynamic documentation using
-     [Brocco](../). -->
+     [Brocco](../). 
+
+     This page uses the combined build of Brocco, which includes all
+     dependencies needed to document syntax-highlighted HTML, CSS, and
+     JS code. To use it, we only need two external files:
+
+     * [docco.css](../vendor/docco.css)
+     * [brocco-combined.min.js](brocco-combined.min.js)
+
+  -->
 <link rel="stylesheet" href="../vendor/docco.css">
 <title></title>
 <div id="container">
@@ -11,13 +20,8 @@
     Jump To &hellip;
     <div id="jump_wrapper">
       <div id="jump_page">
-        <!-- These are links for the pages that will be documented. Brocco
-             automatically turns them into real links on page load. -->
         <a class="source">index.html</a>
       </div>
   </div>
 </div>
-<!-- We're using the [combined build](brocco-combined.min.js) of Brocco,
-     which includes all dependencies needed to document syntax-highlighted
-     HTML, CSS, and JS code. -->
 <script src="brocco-combined.min.js"></script>
