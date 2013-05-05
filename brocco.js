@@ -18,6 +18,10 @@
 // languages you're documenting, and Brocco will take care of
 // the rest.
 //
+// If you don't want to figure out all the different scripts needed
+// to document and syntax highlight HTML/CSS/JS code, you might want
+// to check out the [combined](combined/) build.
+//
 // ## Add-ons
 //
 // <code>[jump-to.js](?jump-to.js)</code> can be used to provide
